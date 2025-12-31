@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy New Year Ayesha ✨</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top, #3b0a6f, #1b0035);
+  overflow: hidden;
+}
+
+iframe {
+  border: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Start screen */
+#startScreen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, #4b0f82, #1b0035);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  color: white;
+  text-align: center;
+  transition: opacity .6s ease;
+}
+
+#startScreen h1 { font-size: 2rem; margin-bottom: 12px; }
+#startScreen p { opacity: .85; margin-bottom: 22px; }
+
+#startBtn {
+  background: linear-gradient(90deg, #ff4f8b, #ff88c2);
+  border: none;
+  border-radius: 999px;
+  padding: 14px 30px;
+  color: white;
+  font-size: 1.1rem;
+  box-shadow: 0 10px 25px rgba(255,79,139,.5);
+}
+
+.hide { opacity: 0; }
+</style>
+</head>
+
+<body>
+
+<div id="startScreen">
+  <h1>Happy New Year, Ayesha ✨</h1>
+  <p>Preparing the moment...</p>
+  <button id="startBtn">Start the Magic ✨</button>
+</div>
+
+<audio id="bgm" preload="auto" loop playsinline>
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<iframe id="frame" src="index.html"></iframe>
+
+<script>
+const music = document.getElementById("bgm");
+const start = document.getElementById("startScreen");
+const btn = document.getElementById("startBtn");
+const label = start.querySelector("p");
+
+btn.disabled = true;
+btn.style.opacity = "0.5";
+btn.style.cursor = "not-allowed";
+
+function getNextMidnight() {
+  const now = new Date();
+  const midnight = new Date();
+  midnight.setHours(24, 0, 0, 0);
+  return midnight;
+}
+
+function updateCountdown() {
+  const now = new Date();
+  const target = getNextMidnight();
+  const diff = target - now;
+
+  if (diff <= 0) {
+    label.textContent = "The moment is here 💖";
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+    clearInterval(timer);
+    return;
+  }
+
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+
+  label.textContent = `Magic begins in ${h}h ${m}m ${s}s ✨`;
+}
+
+const timer = setInterval(updateCountdown, 1000);
+updateCountdown();
+
+btn.addEventListener("click", () => {
+  if (btn.disabled) return;
+
+  music.currentTime = 28;
+  music.play();
+
+  const frame = document.getElementById("frame");
+
+  if (frame.contentWindow) {
+    frame.contentWindow.postMessage("startMagic", "*");
+  } else {
+    frame.addEventListener("load", () => {
+      frame.contentWindow.postMessage("startMagic", "*");
+    }, { once: true });
+  }
+
+  start.classList.add("hide");
+  setTimeout(() => start.style.display = "none", 600);
+});
+</script>
+
+</body>
+</html>
